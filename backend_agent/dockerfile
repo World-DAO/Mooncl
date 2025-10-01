@@ -1,38 +1,28 @@
-# 必须针对 linux/amd64
-# 注：多数情况下建议在构建命令里加 --platform=linux/amd64，这里也显式标注一份
+# for linux/amd64
 FROM --platform=linux/amd64 python:3.12-slim AS runtime
 
-# 以 root 运行（python 官方镜像默认就是 root）
+# run as root
 USER root
 
-# 基本优化
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     PIP_NO_CACHE_DIR=1
 
-# 可选：安装系统依赖（如果你的 requirements 里需要编译某些包）
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential gcc curl && \
     rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
-# 先复制依赖文件，利用缓存
 COPY requirements.txt /app/requirements.txt
 
-# 安装依赖
 RUN pip install --upgrade pip && \
     pip install -r requirements.txt
 
-# 复制项目源代码
 COPY . /app
 
-# 暴露服务端口
+# running port
 EXPOSE 23587
 
-# 健康检查（可选），如果你有 /health 之类的路由可打开
-# HEALTHCHECK --interval=30s --timeout=3s --retries=3 CMD \
-#     python -c "import urllib.request; urllib.request.urlopen('http://127.0.0.1:23587/health')" || exit 1
-
-# 入口（按你的要求：python main.py）
+# python main.py
 CMD ["python", "-u", "main.py"]
