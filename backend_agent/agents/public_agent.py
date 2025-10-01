@@ -1,5 +1,8 @@
 from agents.prototype import TOKEN2049Agent
 import json
+import asyncio
+
+from agents.utils import safe_parse_json
 
 class PublicInfAgent(TOKEN2049Agent):
     def __init__(self, model: str = "qwen-plus", enable_thinking: bool = True, temperature: float = 0.0):
@@ -79,3 +82,27 @@ You do not judge factual correctness beyond obvious harm signals. Do not provide
         except Exception:
             # 兜底：返回一个空结构，避免上层炸
             return {"dimension_scores": {}, "score_total": 0, "penalties": [], "reason": "", "confidence": 0.0}
+        
+    async def review_stream(self, inputs: dict, queue: asyncio.Queue, print_res: bool=False) -> dict:
+        json_content = json.dumps(inputs, ensure_ascii=False)
+        first = await self.aclient.chat.completions.create(
+            model=self.model,
+            messages=[
+                {"role": "system", "content": self.system_prompt},
+                {"role": "user", "content": json_content}
+            ],
+            temperature=self.temperature,
+            max_tokens=1024,
+            stream=True,
+            response_format={"type": "json_object"}
+        )
+        buffer = ""
+        async for event in first:
+            delta = event.choices[0].delta
+            if delta and delta.content:
+                buffer += delta.content
+                await queue.put(("reviewer:PublicInfAgent", buffer))
+
+        parsed = safe_parse_json(buffer, default={"_raw": buffer})
+        await queue.put((f"done_public", parsed))
+        return parsed

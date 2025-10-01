@@ -1,17 +1,27 @@
-# How to run
+# AI agents & Eigen
 
-1. create a `.env` file:
+```bash
+# build locally to test
+docker buildx build --platform linux/amd64 -t yazhul1cache/mooncl:latest .
+docker run --rm -p 23587:23587 yazhul1cache/mooncl:latest
+```
+
+Now, prepare your `.env` file, including the `MNEMONIC` and necessary API key for eigen cloud & eigen AI:
 
 ```bash
 OPENAI_API_KEY="your-api-key"
 BASE_URL="your-api-base-url"
 FAST_MODEL="your-model"
+MNEMONIC="your phrases"
 ```
 
-2. install packages and run:
+then deploy to eigen-compute:
 
 ```bash
-pip install fastapi uvicorn openai python-dotenv
+# login & auth
+eigenx auth login             # or first eigenx auth generate --store
+docker login
 
-python main.py
+# deploy
+eigenx app deploy
 ```
