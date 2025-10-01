@@ -57,3 +57,7 @@ dist
 .env
 
 API_DOCS.md
+
+# python
+__pycache__/
+*.pyc
