@@ -9,9 +9,6 @@ Turn opinions into on-chain assets. Publish a take, our AI scores it to set the 
 - Market browsing: ranking list with pagination; open item detail in a modal.
 - NFT detail: price, creator address, and content with a consistent glass UI.
 - Publish flow: large textarea input, mint action, loading state, and AI score result screen.
-- URL-driven modals: ?modal=market|publish|detail&nft={id} for deep links and clean navigation.
-- Wallet UI: network and account controls using Reown AppKit with custom glass styling.
-- Balance and address display: short address plus live balance (via wagmi).
 - Reusable design system: tokens (CSS variables), atomic UI components, and composable modal/layout components.
 - Responsive layout and consistent animations, hover states, and button variants (brand/glass).
 
