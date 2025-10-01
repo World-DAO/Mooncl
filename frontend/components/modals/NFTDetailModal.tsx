@@ -67,7 +67,7 @@ export default function NFTDetailModal({
 
     (async () => {
       try {
-        const d: OpinionDetail = await getOpinionDetail(opinionId);
+        const d: OpinionDetail = await getOpinionDetail(opinionId, { chainId });
         if (ctrl.signal.aborted || myId !== reqIdRef.current) return;
 
         const mapped: NFTDetailData = {

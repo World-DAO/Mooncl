@@ -7,6 +7,7 @@ import type { NFTBasic } from "./nfts/NFTCard";
 import Button from "@/components/ui/Button";
 import NFTListRows from "./nfts/NFTListRows";
 import { getOpinionsRanking } from "@/lib/api/opinions";
+import { useChainId } from "wagmi";
 
 interface Props {
   open: boolean;
@@ -24,6 +25,7 @@ export default function MarketModal({
   onSelect,
 }: Props) {
   const LIMIT = 6;
+  const chainId = useChainId();
   const [page, setPage] = React.useState(0);
   const [allItems, setAllItems] = React.useState<NFTBasic[] | null>(null);
   const [loadingAll, setLoadingAll] = React.useState(false);
@@ -36,7 +38,7 @@ export default function MarketModal({
     setLoadingAll(true);
     (async () => {
       try {
-        const list = await getOpinionsRanking({ sort_by: 'price', limit: 1000, offset: 0 });
+        const list = await getOpinionsRanking({ sort_by: 'price', limit: 1000, offset: 0, chainId });
         if (!alive) return;
         const mapped: NFTBasic[] = list.map((it) => ({
           id: String(it.token_id),

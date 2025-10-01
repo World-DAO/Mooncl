@@ -1,4 +1,5 @@
 import { getJSON } from '../http';
+import { PASEO_PASSET_HUB_CHAIN_ID } from '@/lib/api.stubs';
 
 export type OpinionDTO = {
   token_id: number;
@@ -18,15 +19,20 @@ export type OpinionItem = {
 };
 
 export async function getOpinionsRanking(
-  params: { sort_by?: 'price' | 'recent'; limit?: number; offset?: number } = {}
+  params: { sort_by?: 'price' | 'recent'; limit?: number; offset?: number; chainId?: number } = {}
 ): Promise<OpinionItem[]> {
   const q = new URLSearchParams();
   if (params.sort_by) q.set('sort_by', params.sort_by);
   if (params.limit != null) q.set('limit', String(params.limit));
   if (params.offset != null) q.set('offset', String(params.offset));
 
+  const path =
+    params.chainId === PASEO_PASSET_HUB_CHAIN_ID
+      ? '/api/v1/nfts/polkadot/ranking'
+      : '/api/v1/nfts/ranking';
+
   const list = await getJSON<OpinionDTO[]>(
-    `/api/v1/nfts/ranking${q.toString() ? `?${q.toString()}` : ''}`
+    `${path}${q.toString() ? `?${q.toString()}` : ''}`
   );
 
   return list.map((d) => ({
@@ -48,11 +54,16 @@ export type OpinionDetail = {
     updated_at: string | null;
   };
   
-  export async function getOpinionDetail(token_id: string | number): Promise<OpinionDetail> {
+  export async function getOpinionDetail(token_id: string | number, opts?: { chainId?: number }): Promise<OpinionDetail> {
     const base = process.env.NEXT_PUBLIC_API_BASE;
     if (!base) throw new Error('NEXT_PUBLIC_API_BASE is not set');
-  
-    const res = await fetch(`${base}/api/v1/nfts/detail/${token_id}`, {
+
+    const path =
+      opts?.chainId === PASEO_PASSET_HUB_CHAIN_ID
+        ? `/api/v1/nfts/polkadot/detail/${token_id}`
+        : `/api/v1/nfts/detail/${token_id}`;
+
+    const res = await fetch(`${base}${path}`, {
       method: 'GET',
       headers: { 'Content-Type': 'application/json' },
       // 需要凭证的话在这里补上 Authorization
