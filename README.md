@@ -17,4 +17,4 @@ https://mooncl.ink/
 
 # Tech Stack
 
-- Next.js, React, nestJs, TypeScript, python
+- Next.js, React, nestJs, TypeScript, python, solidity
