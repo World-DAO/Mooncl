@@ -58,16 +58,7 @@ export default function NFTListRows({
       setData(items ?? []);
       firstLoadedRef.current = true;
       loadingRef.current?.(false);
-      loadedRef.current?.(items?.length ?? 0);
-      return;
-    }
-
-    // 外部传了非空 items：直接用，不发请求
-    if (items && items.length > 0) {
-      setData(items);
-      firstLoadedRef.current = true;
-      loadedRef.current?.(items.length);
-      loadingRef.current?.(false);
+      loadedRef.current?.((items?.length ?? 0));
       return;
     }
 

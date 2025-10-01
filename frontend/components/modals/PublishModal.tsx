@@ -56,8 +56,8 @@ export default function PublishModal({
   }, [open, mintTx]);
 
   const calcScore = React.useCallback((content: string) => {
-    const len = Math.max(0, Math.min(100, content.trim().length));
-    return 65 + Math.round((len / 100) * 30); // 65~95
+    const len = Math.max(0, Math.min(500, content.trim().length));
+    return 65 + Math.round((len / 500) * 30); // 65~95
   }, []);
 
   React.useEffect(() => {
