@@ -31,7 +31,7 @@ export default function NFTDetail({ data, className, actions }: Props) {
   // 格式化价格（$xx.xx）
   const priceText =
     typeof data.price === "number"
-      ? `${data.currency ?? "$"}${Number(data.price).toFixed(2)}`
+      ? `${data.currency ?? "$"}${Number(data.price).toFixed(4)}`
       : undefined;
 
   // 缩写地址（0x1234…abcd）

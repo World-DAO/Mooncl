@@ -8,10 +8,12 @@ import Button from "@/components/ui/Button";
 import { useWallet } from "@/contexts/WalletContext";
 import TextGradient from "@/components/ui/TextGradient";
 import Overlay from "@/components/ui/Overlay";
+import { useToast } from "@/components/providers/ToastProvider";
 
 const LoginPage: React.FC = () => {
   const router = useRouter();
   const { connectWallet, connectWithGoogle, state } = useWallet();
+  const toast = useToast();
 
   // 登录成功：写 cookie，跳转到首页 /
   React.useEffect(() => {
@@ -22,6 +24,13 @@ const LoginPage: React.FC = () => {
       router.replace("/");
     }
   }, [state?.isConnected, router]);
+
+  // show toast for login errors instead of inline block
+  React.useEffect(() => {
+    if (state?.error) {
+      toast.error(state.error, "Login");
+    }
+  }, [state?.error, toast]);
 
   return (
     <div className="min-h-screen relative overflow-hidden">
@@ -112,7 +121,7 @@ const LoginPage: React.FC = () => {
           </h1>
           <p className="text-gray-300 text-lg mb-2">EmptyLab</p>
           <p className="text-gray-400 text-sm">
-            Sharing your own opinions
+            Seen. Priced. Traded.
           </p>
         </div>
 
@@ -144,12 +153,7 @@ const LoginPage: React.FC = () => {
           </Button> */}
         </div>
 
-        {/* 错误提示 */}
-        {state.error && (
-          <div className="mt-4 p-3 bg-red-500/20 border border-red-500/30 rounded-lg text-red-300 text-sm">
-            {state.error}
-          </div>
-        )}
+        {/* 错误提示改为 Toast，不在此处显示 */}
       </div>
     </div>
   );

@@ -6,6 +6,7 @@ import Dialog from "@/components/ui/Dialog";
 import type { NFTBasic } from "./nfts/NFTCard";
 import Button from "@/components/ui/Button";
 import NFTListRows from "./nfts/NFTListRows";
+import { getOpinionsRanking } from "@/lib/api/opinions";
 
 interface Props {
   open: boolean;
@@ -23,24 +24,57 @@ export default function MarketModal({
   onSelect,
 }: Props) {
   const LIMIT = 6;
-  const [offset, setOffset] = React.useState(0);
-  const [hasNext, setHasNext] = React.useState(true);
-  const [listLoading, setListLoading] = React.useState(false);
-  const handleLoaded = React.useCallback((count: number) => {
-    setHasNext(count >= LIMIT);
-  }, [LIMIT]);
+  const [page, setPage] = React.useState(0);
+  const [allItems, setAllItems] = React.useState<NFTBasic[] | null>(null);
+  const [loadingAll, setLoadingAll] = React.useState(false);
 
-  // 弹窗每次打开时重置到第一页
+  // 弹窗每次打开：拉取全部数据一次，后续分页在前端进行
   React.useEffect(() => {
-    if (open) {
-      setOffset(0);
-      setHasNext(true);
-    }
+    let alive = true;
+    if (!open) return;
+    setPage(0);
+    setLoadingAll(true);
+    (async () => {
+      try {
+        const list = await getOpinionsRanking({ sort_by: 'price', limit: 1000, offset: 0 });
+        if (!alive) return;
+        const mapped: NFTBasic[] = list.map((it) => ({
+          id: String(it.token_id),
+          title: it.title,
+          price: it.current_price,
+          image: '/img/placeholder/card.png',
+          currency: '$',
+        }));
+        setAllItems(mapped);
+      } catch (e) {
+        console.error('Fetch market failed', e);
+        if (!alive) return;
+        setAllItems([]);
+      } finally {
+        if (alive) setLoadingAll(false);
+      }
+    })();
+    return () => {
+      alive = false;
+    };
   }, [open]);
 
+  const total = allItems?.length ?? 0;
+  const hasNext = (page + 1) * LIMIT < total;
+  const hasPrev = page > 0;
+  const pageItems = React.useMemo(() => {
+    if (!allItems) return [] as NFTBasic[];
+    const start = page * LIMIT;
+    return allItems.slice(start, start + LIMIT);
+  }, [allItems, page]);
+
   const handleNext = () => {
-    if (!hasNext || listLoading) return;
-    setOffset((o) => o + LIMIT); // ✅ 只做分页偏移
+    if (loadingAll || !hasNext) return;
+    setPage((p) => p + 1);
+  };
+  const handlePrev = () => {
+    if (loadingAll || !hasPrev) return;
+    setPage((p) => Math.max(0, p - 1));
   };
 
   return (
@@ -48,8 +82,8 @@ export default function MarketModal({
       open={open}
       onOpenChange={onOpenChange}
       title={
-        <span className="text-white text-2xl md:text-3xl font-semibold">
-          Let’s Meet
+        <span className="text-white text-2xl md:text-3xl font-semibold ml-2">
+          ✨ Insight Market
         </span>
       }
       size="lg"
@@ -59,37 +93,47 @@ export default function MarketModal({
         {/* 列表区 */}
         <div className="overflow-y-auto px-6 pt-6 pr-7">
           <NFTListRows
-            open={open}
-            // 不传 items => 走接口；若要兼容旧数据，传 items={[]} 也可
+            // 传入 items（即使为空）以禁用内部请求逻辑；首次加载时显示骨架
+            items={pageItems}
+            open={false}
             sortBy="price"
-            limit={LIMIT}
-            offset={offset}
-            onLoaded={handleLoaded}
-            onLoadingChange={setListLoading} // setState 本身引用是稳定的，保持不变即可
             onSelect={onSelect}
-            onBuy={(id) => onSelect?.(id)}                     // 只有点行/BUY 才打开详情
+            onBuy={(id) => onSelect?.(id)}
           />
         </div>
 
         {/* 底部操作区 */}
         <div className="px-6 pb-6 pt-4">
           <div className="flex justify-center gap-4">
-            <Button
-              appearance="glass"
-              size="md"
-              onClick={handleNext}
-              disabled={!hasNext || listLoading}
-              className="min-w-[96px]"
-            >
-              {listLoading ? (
-                <span className="inline-flex items-center">
-                  <span className="w-4 h-4 mr-2 border-2 border-white/50 border-t-transparent rounded-full animate-spin" />
-                  Loading
-                </span>
-              ) : (
-                "Next"
-              )}
-            </Button>
+            {hasPrev && (
+              <Button
+                appearance="glass"
+                size="md"
+                onClick={handlePrev}
+                disabled={loadingAll}
+                className="min-w-[96px]"
+              >
+                Prev
+              </Button>
+            )}
+            {hasNext && (
+              <Button
+                appearance="glass"
+                size="md"
+                onClick={handleNext}
+                disabled={loadingAll}
+                className="min-w-[96px]"
+              >
+                {loadingAll ? (
+                  <span className="inline-flex items-center">
+                    <span className="w-4 h-4 mr-2 border-2 border-white/50 border-t-transparent rounded-full animate-spin" />
+                    Loading
+                  </span>
+                ) : (
+                  "Next"
+                )}
+              </Button>
+            )}
           </div>
         </div>
       </div>

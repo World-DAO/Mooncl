@@ -25,7 +25,7 @@ export default function PublishForm({ onSubmit, defaultValue = '' }: Props) {
       <Textarea
         value={content}
         onChange={(e) => setContent(e.target.value)}
-        placeholder="Describe your NFT idea, traits, story... (this will be used for minting)"
+        placeholder="From spark to asset, in one mint"
         className="
           h-52 md:h-64
           resize-none

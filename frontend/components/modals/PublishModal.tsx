@@ -56,8 +56,8 @@ export default function PublishModal({
   }, [open, mintTx]);
 
   const calcScore = React.useCallback((content: string) => {
-    const len = Math.max(0, Math.min(1000, content.trim().length));
-    return 65 + Math.round((len / 1000) * 30); // 65~95
+    const len = Math.max(0, Math.min(100, content.trim().length));
+    return 65 + Math.round((len / 100) * 30); // 65~95
   }, []);
 
   React.useEffect(() => {
@@ -148,7 +148,7 @@ export default function PublishModal({
               <span className="inline-flex items-center justify-center w-9 h-9 md:w-11 md:h-11 rounded-xl bg-white/8 border border-white/20 backdrop-blur-lg">
                 <span className="text-xl md:text-2xl">👋</span>
               </span>
-              <span>Leave your thoughts on blockchain</span>
+              <span>Turn your opinions into assets</span>
             </h2>
           </div>
 

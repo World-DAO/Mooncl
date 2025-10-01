@@ -8,6 +8,7 @@ import { getLaunchpadAddress, isSupportedChain } from '@/lib/api.stubs';
 import { useChainId } from 'wagmi';
 import { useWallet } from '@/contexts/WalletContext';
 import { parseEther } from 'viem';
+import { useToast } from '@/components/providers/ToastProvider';
 
 interface NFTDetailModalProps {
   open: boolean;
@@ -50,6 +51,7 @@ export default function NFTDetailModal({
   const { buy, transaction: buyTx } = useAiLaunchpad({ address: launchpadAddress, chainId: resolvedChainId });
   const { state: walletState, connectWallet } = useWallet();
   const isWrongChain = chainId !== undefined && !isChainSupported;
+  const toast = useToast();
 
   React.useEffect(() => {
     if (!open || !opinionId) {
@@ -73,7 +75,7 @@ export default function NFTDetailModal({
           title: d.content || `Opinion #${d.token_id}`,
           image: '/img/placeholder/card.png', // 占位图，满足 NFTDetail 的 image 可选
           desc: d.content ?? '',
-          price: Number(d.evaluate_price ?? 0),
+          price: Number(d.current_price ?? 0),
           currency: '$',
           owner: d.owner_address || 'unknown',
         };
@@ -99,12 +101,13 @@ export default function NFTDetailModal({
     if (!buyId) return;
 
     if (isWrongChain) {
-      setBuyError('当前链未配置合约');
+      setBuyError('There is no smart contract on this chain, please wait');
       return;
     }
 
     if (!walletState.isConnected) {
-      setBuyError('请先连接钱包');
+      setBuyError('Please connect the wallet first');
+      toast.info('Please connect your wallet', 'Purchase');
       try {
         await connectWallet();
       } catch (err) {
@@ -116,6 +119,7 @@ export default function NFTDetailModal({
     const price = displayData?.price;
     if (price == null) {
       setBuyError('No price available for this token');
+      toast.error('No price available', 'Purchase');
       return;
     }
 
@@ -124,6 +128,7 @@ export default function NFTDetailModal({
       listingId = BigInt(buyId);
     } catch (err) {
       setBuyError('Invalid token id');
+      toast.error('Invalid token id', 'Purchase');
       return;
     }
 
@@ -133,6 +138,7 @@ export default function NFTDetailModal({
     } catch (err) {
       console.error('parse price failed', err);
       setBuyError('Invalid price format');
+      toast.error('Invalid price', 'Purchase');
       return;
     }
 
@@ -144,12 +150,13 @@ export default function NFTDetailModal({
       console.error('buy failed', err);
       const message = err instanceof Error ? err.message : 'Buy failed';
       setBuyError(message);
+      toast.error('Buy failed', 'Transaction');
       setPendingBuyId(null);
     }
   }, [buy, buyId, connectWallet, displayData?.price, isWrongChain, walletState.isConnected]);
 
   React.useEffect(() => {
-    if (!isWrongChain && buyError === '当前链未配置合约') {
+    if (!isWrongChain && buyError === 'There is no smart contract on this chain, please wait') {
       setBuyError(null);
     }
   }, [buyError, isWrongChain]);
@@ -160,6 +167,7 @@ export default function NFTDetailModal({
     if (buyTx.isError) {
       const message = buyTx.error?.message ?? 'Buy failed';
       setBuyError(message);
+      toast.error('Buy failed', 'Transaction');
       setPendingBuyId(null);
       buyTx.reset?.();
       return;
@@ -206,15 +214,11 @@ export default function NFTDetailModal({
             </Button>
           </div>
           {isWrongChain && (
-            <div className="text-amber-200 text-sm text-center px-4">
-              当前连接的网络暂未配置合约，请切换到受支持的链。
+            <div className="text-white/75 text-sm text-center px-4">
+              There is no smart contract on this chain, please change to other supporting chain.
             </div>
           )}
-          {buyError && (
-            <div className="text-red-200 text-sm text-center px-4">
-              {buyError}
-            </div>
-          )}
+          {/* Other errors now shown via toast, not inline here */}
           {lastTxHash && (
             <div className="text-white/60 text-sm break-all text-center px-4">
               Tx Hash: {lastTxHash}
