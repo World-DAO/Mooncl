@@ -1,0 +1,110 @@
+@import "tailwindcss";
+@import "../styles/tokens.css";
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+  color-scheme: dark;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+
+html, body {
+  height: 100%;
+  background: var(--bg);
+  color: var(--fg);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+* { box-sizing: border-box; }
+img, svg, video, canvas {
+  max-width: 100%;
+  height: auto;
+}
+
+/* 选中高亮 */
+::selection {
+  background: color-mix(in oklab, var(--brand-2) 35%, transparent);
+  color: #fff;
+}
+
+/* ===== Utilities（仅保留少量全局工具类）===== */
+
+/* 渐变文字：用于标题里 “Mooncl” */
+.text-brand-gradient {
+  background: var(--gradient-brand);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* 玻璃表面：用于非按钮容器（面板/卡片），按钮请用组件的 glass 变体 */
+.glass-surface {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--elev-1);
+  backdrop-filter: blur(var(--blur-md));
+  -webkit-backdrop-filter: blur(var(--blur-md));
+  border-radius: var(--radius-md);
+}
+
+/* 阴影层级（可选） */
+.elevation-1 { box-shadow: var(--elev-1); }
+.elevation-2 { box-shadow: var(--elev-2); }
+
+/* 禁止拖拽/选择（像素背景用得到） */
+.no-drag {
+  -webkit-user-drag: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+}
+
+.text-brand-gradient{
+  background: var(--gradient-brand);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  display:inline-block;
+}
+
+/* 通用玻璃胶囊按钮外观 */
+.glass-chip {
+  padding: 6px 12px;
+  border-radius: 9999px;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.18);
+  backdrop-filter: blur(10px);
+  transition: transform .12s ease, background-color .12s ease, box-shadow .12s ease;
+}
+
+.glass-chip:hover {
+  background: rgba(255,255,255,0.12);
+  box-shadow: 0 4px 24px rgba(0,0,0,0.25);
+  transform: translateY(-1px);
+}
+
+.glass-chip:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 12px rgba(0,0,0,0.2);
+}

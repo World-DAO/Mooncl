@@ -1,0 +1,55 @@
+/* ========== Design Tokens (global CSS variables) ========== */
+/* 深色为主；如果要支持浅色，可再加 [data-theme="light"] 一组覆盖 */
+:root {
+  /* Brand colors */
+  --brand-1: #7c3aed; /* violet-600 */
+  --brand-2: #22d3ee; /* cyan-400 */
+  --fg: #ffffff;
+  --bg: #0b1020; /* 深背景，像素风更干净 */
+
+  /* Brand gradient (给按钮/标题用) */
+  --gradient-brand: linear-gradient(
+    90deg,
+    #ff4dd2 0%,
+    #7b5cff 55%,
+    #29d3ff 100%
+  );
+  /* Glassmorphism */
+  --glass-alpha: 0.03; /* 玻璃背景透明度 */
+  --glass-border-alpha: 0.28; /* 玻璃描边透明度 */
+  --glass-bg: rgba(255, 255, 255, var(--glass-alpha));
+  --glass-border: rgba(255, 255, 255, var(--glass-border-alpha));
+  --blur-sm: 8px;
+  --blur-md: 12px;
+
+  /* Radii */
+  --radius-sm: 10px; /* Chip */
+  --radius-md: 14px; /* Button */
+  --radius-lg: 20px; /* 大按钮/面板 */
+
+  /* Elevation (shadow) */
+  --elev-1: 0 4px 12px rgba(0, 0, 0, 0.25);
+  --elev-2: 0 10px 24px rgba(0, 0, 0, 0.35);
+
+  /* Motion */
+  --dur-fast: 120ms;
+  --dur-base: 200ms;
+  --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+
+  /* Overlays */
+  --overlay-alpha: 0.38; /* 登录页灰蒙强度 */
+  /* 角落的氛围渐变（偏湖蓝/青） */
+  --overlay-corner-gradient: linear-gradient(
+    135deg,
+    rgba(71, 85, 105, 0.60) 0%,   /* slate-600 */
+    rgba(30, 41, 59, 0.50) 50%,   /* slate-800 */
+    rgba(2, 6, 23, 0.45) 75%,     /* slate-950 */
+    transparent 85%
+  );
+}
+
+/* 可选：高对比（夜间更亮一点） */
+/* [data-contrast="high"] {
+    --glass-alpha: 0.1;
+    --glass-border-alpha: 0.22;
+  } */
