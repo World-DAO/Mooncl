@@ -17,10 +17,4 @@ Turn opinions into on-chain assets. Publish a take, our AI scores it to set the 
 
 # **Tech Stack**
 
-- Next.js (App Router), React, TypeScript
-- Tailwind CSS with design tokens (CSS variables)
-- wagmi for account and balance
-- Reown AppKit for network/account panels
-- Fetch-based API integration for opinions:
-    - GET /api/v1/opinions/ranking
-    - GET /api/v1/opinions/detail/{opinion_id}
+- Next.js, React, nestJs, TypeScript, python
