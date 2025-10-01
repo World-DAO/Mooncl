@@ -33,7 +33,7 @@ export default function NFTListRow({ item, onClick, onBuy }: Props) {
             disabled
             className="rounded-2xl px-3 py-1 cursor-default"
           >
-            {item.currency ?? "$"} {item.price}
+            {item.currency ?? "$"} {Number(item.price).toFixed(4)}
           </Button>
         </div>
 

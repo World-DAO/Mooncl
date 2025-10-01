@@ -4,6 +4,7 @@ import * as React from 'react';
 import NFTListRow from './NFTListRow';
 import type { NFTBasic } from './NFTCard';
 import { getOpinionsRanking } from '@/lib/api/opinions';
+import { useToast } from '@/components/providers/ToastProvider';
 
 type Props = {
   /** 父层不传或传空数组时，组件内部会自动从接口拉取榜单 */
@@ -41,6 +42,7 @@ export default function NFTListRows({
   const [error, setError] = React.useState<string | null>(null);
   const firstLoadedRef = React.useRef(false);
   const reqIdRef = React.useRef(0); // 请求去重
+  const toast = useToast();
 
   // ✅ 用 ref 保存回调，避免把回调放进依赖数组导致重复请求
   const loadedRef = React.useRef<Props['onLoaded'] | undefined>(undefined);
@@ -48,7 +50,18 @@ export default function NFTListRows({
   loadedRef.current = onLoaded;
   loadingRef.current = onLoadingChange;
 
+  // 如果父层明确传入 items（包括空数组），则跳过内部请求，完全由父层控制
+  const externalControl = items !== undefined;
+
   React.useEffect(() => {
+    if (externalControl) {
+      setData(items ?? []);
+      firstLoadedRef.current = true;
+      loadingRef.current?.(false);
+      loadedRef.current?.(items?.length ?? 0);
+      return;
+    }
+
     // 外部传了非空 items：直接用，不发请求
     if (items && items.length > 0) {
       setData(items);
@@ -86,7 +99,9 @@ export default function NFTListRows({
       })
       .catch((e) => {
         if (ctrl.signal.aborted || myId !== reqIdRef.current) return;
-        setError(e.message || 'Failed to load');
+        const msg = e.message || 'Failed to load';
+        setError(msg);
+        toast.error(msg, 'Market');
         loadedRef.current?.(0);
       })
       .finally(() => {
@@ -96,7 +111,7 @@ export default function NFTListRows({
       });
 
     return () => ctrl.abort();
-  }, [items, sortBy, open, limit, offset]);
+  }, [items, externalControl, sortBy, open, limit, offset]);
 
   // —— 首次加载：骨架 + 文案 ——
   if (loading && !firstLoadedRef.current) {
@@ -122,11 +137,7 @@ export default function NFTListRows({
         </div>
       )}
 
-      {error && data.length === 0 && (
-        <div className="rounded-2xl border border-red-400/30 bg-red-400/10 text-red-200 px-4 py-3">
-          {error}
-        </div>
-      )}
+      {/* 错误改为 toast，不在此处显示 */}
 
       {data.map((it) => (
         <NFTListRow

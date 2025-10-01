@@ -7,6 +7,7 @@ import { AppKitProvider } from '@reown/appkit/react';
 
 import { appKitOptions, wagmiConfig, appKitProjectId } from '@/lib/appkit';
 import { WalletProvider } from '@/contexts/WalletContext';
+import ToastProvider from '@/components/providers/ToastProvider';
 
 type Props = {
   children: ReactNode;
@@ -30,7 +31,9 @@ export default function AppProviders({ children }: Props) {
     <WagmiProvider config={wagmiConfig}>
       <QueryClientProvider client={queryClient}>
         <AppKitProvider {...appKitOptions}>
-          <WalletProvider>{children}</WalletProvider>
+          <WalletProvider>
+            <ToastProvider>{children}</ToastProvider>
+          </WalletProvider>
         </AppKitProvider>
       </QueryClientProvider>
     </WagmiProvider>
